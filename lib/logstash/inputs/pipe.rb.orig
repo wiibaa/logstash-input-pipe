@@ -26,6 +26,13 @@ class LogStash::Inputs::Pipe < LogStash::Inputs::Base
   #    command => "echo hello world"
   config :command, :validate => :string, :required => true
 
+<<<<<<< HEAD
+  def initialize(params)
+    super
+    @shutdown_requested = false
+    @pipe = nil
+  end # def initialize
+=======
   # Should the pipe be restarted when it exits. Valid values are:
   # * "always" - restart after every exit of the pipe command
   # * "error" - restart only after an erroneous condition of the pipe command
@@ -39,12 +46,7 @@ class LogStash::Inputs::Pipe < LogStash::Inputs::Base
 
   # Number of seconds to wait before restarting the pipe
   config :wait_on_restart, :validate => :number, :default => 10
-
-  def initialize(params)
-    super
-    @shutdown_requested = false
-    @pipe = nil
-  end # def initialize
+>>>>>>> PR https://github.com/elasticsearch/logstash/pull/1415
 
   public
   def register
@@ -56,8 +58,14 @@ class LogStash::Inputs::Pipe < LogStash::Inputs::Base
   def run(queue)
     while !@shutdown_requested
       begin
+<<<<<<< HEAD
         @pipe = IO.popen(@command, mode = "r")
+        hostname = Socket.gethostname
+
         @pipe.each do |line|
+=======
+        IO.popen(@command, mode="r").each do |line|
+>>>>>>> PR https://github.com/elasticsearch/logstash/pull/1415
           line = line.chomp
           @logger.debug? && @logger.debug("Received line", :command => @command, :line => line)
           @codec.decode(line) do |event|
@@ -67,9 +75,12 @@ class LogStash::Inputs::Pipe < LogStash::Inputs::Base
             queue << event
           end
         end
-	    @pipe.close
+<<<<<<< HEAD
+        @pipe.close
         @pipe = nil
+=======
         break unless @restart == "always"
+>>>>>>> PR https://github.com/elasticsearch/logstash/pull/1415
       rescue LogStash::ShutdownSignal => e
         break
       rescue Exception => e
